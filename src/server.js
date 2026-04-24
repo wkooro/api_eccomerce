@@ -20,7 +20,10 @@ const orderRoutes = require('./modules/orders/orderRoutes');
 const paymentRoutes = require('./modules/payments/paymentRoutes');
 const categoryRoutes = require('./modules/categories/categoryRoutes');
 const userRoutes = require('./modules/users/userRoutes');
+<<<<<<< HEAD
 const couponRoutes = require('./modules/coupons/couponRoutes');
+=======
+>>>>>>> 35a4f5c9f644d653549f1d057fcfe07d21e1b27d
 const authMiddleware = require('./middlewares/authMiddleware');
 
 const app = express();
@@ -54,7 +57,10 @@ app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/users', userRoutes);
+<<<<<<< HEAD
 app.use('/api/v1/coupons', couponRoutes);
+=======
+>>>>>>> 35a4f5c9f644d653549f1d057fcfe07d21e1b27d
 
 // 404 Handler
 app.use((req, res, next) => {

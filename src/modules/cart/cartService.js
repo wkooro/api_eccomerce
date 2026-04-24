@@ -1,6 +1,7 @@
 const redisClient = require('../../config/redis');
 const prisma = require('../../config/database');
 const AppError = require('../../utils/AppError');
+<<<<<<< HEAD
 // Lazy load do couponService dentro das funções para evitar problemas de inicilização circular se houver, mas aqui vou importar no topo se possivel. 
 // Como couponService é autônomo, ok.
 const couponService = require('../coupons/couponService');
@@ -33,17 +34,27 @@ const saveCart = async (key, cart) => {
     return cart;
 };
 
+=======
+
+const CART_TTL = 30 * 24 * 60 * 60; // 30 dias
+
+>>>>>>> 35a4f5c9f644d653549f1d057fcfe07d21e1b27d
 const cartService = {
     getCart: async (userId, tenantId = 'default') => {
         const key = `cart:${tenantId}:${userId}`;
         const cartData = await redisClient.get(key);
+<<<<<<< HEAD
         return cartData ? JSON.parse(cartData) : { items: [], subtotal: 0, discount: 0, total: 0, couponCode: null };
+=======
+        return cartData ? JSON.parse(cartData) : { items: [], total: 0 };
+>>>>>>> 35a4f5c9f644d653549f1d057fcfe07d21e1b27d
     },
 
     addItem: async (userId, itemData, tenantId = 'default') => {
         const { productId, quantity } = itemData;
         const key = `cart:${tenantId}:${userId}`;
 
+<<<<<<< HEAD
         const product = await prisma.product.findUnique({ where: { id: productId } });
         if (!product) throw new AppError('Produto não encontrado', 404, 'RESOURCE_NOT_FOUND');
         if (product.stock < quantity) throw new AppError('Estoque insuficiente', 409, 'OUT_OF_STOCK');
@@ -53,6 +64,28 @@ const cartService = {
         const existingItemIndex = cart.items.findIndex(i => i.productId === productId);
         if (existingItemIndex > -1) {
             cart.items[existingItemIndex].quantity += quantity;
+=======
+        // Validar Produto e Estoque
+        const product = await prisma.product.findUnique({ where: { id: productId } });
+
+        if (!product) {
+            throw new AppError('Produto não encontrado', 404, 'RESOURCE_NOT_FOUND');
+        }
+
+        if (product.stock < quantity) {
+            throw new AppError('Estoque insuficiente', 409, 'OUT_OF_STOCK');
+        }
+
+        // Buscar carrinho atual
+        let cart = await cartService.getCart(userId, tenantId);
+
+        // Atualizar ou Adicionar Item
+        const existingItemIndex = cart.items.findIndex(i => i.productId === productId);
+
+        if (existingItemIndex > -1) {
+            cart.items[existingItemIndex].quantity += quantity;
+            // Re-verificar estoque total
+>>>>>>> 35a4f5c9f644d653549f1d057fcfe07d21e1b27d
             if (product.stock < cart.items[existingItemIndex].quantity) {
                 throw new AppError('Estoque insuficiente para a quantidade total', 409, 'OUT_OF_STOCK');
             }
@@ -65,7 +98,17 @@ const cartService = {
             });
         }
 
+<<<<<<< HEAD
         return await saveCart(key, cart);
+=======
+        // Recalcular total
+        cart.total = cart.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+        // Salvar no Redis
+        await redisClient.set(key, JSON.stringify(cart), { EX: CART_TTL });
+
+        return cart;
+>>>>>>> 35a4f5c9f644d653549f1d057fcfe07d21e1b27d
     },
 
     removeItem: async (userId, productId, tenantId = 'default') => {
@@ -73,6 +116,7 @@ const cartService = {
         let cart = await cartService.getCart(userId, tenantId);
 
         cart.items = cart.items.filter(item => item.productId !== productId);
+<<<<<<< HEAD
 
         return await saveCart(key, cart);
     },
@@ -107,6 +151,12 @@ const cartService = {
 
         cart.couponCode = null;
         return await saveCart(key, cart);
+=======
+        cart.total = cart.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+        await redisClient.set(key, JSON.stringify(cart), { EX: CART_TTL });
+        return cart;
+>>>>>>> 35a4f5c9f644d653549f1d057fcfe07d21e1b27d
     }
 };
 

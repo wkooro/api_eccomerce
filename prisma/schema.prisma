@@ -79,11 +79,15 @@ model Order {
   userId     String
   user       User        @relation(fields: [userId], references: [id])
   status     OrderStatus @default(PENDING)
+<<<<<<< HEAD
   totalValue Decimal     @db.Decimal(10, 2) // Valor final a pagar (pós desconto)
   subtotal   Decimal     @db.Decimal(10, 2) @default(0) // Valor dos itens antes do desconto
   discount   Decimal     @db.Decimal(10, 2) @default(0)
   couponId   String?
   coupon     Coupon?     @relation(fields: [couponId], references: [id])
+=======
+  totalValue Decimal     @db.Decimal(10, 2)
+>>>>>>> 35a4f5c9f644d653549f1d057fcfe07d21e1b27d
   tenantId   String      @default("default")
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
@@ -94,6 +98,7 @@ model Order {
   @@map("orders")
 }
 
+<<<<<<< HEAD
 enum CouponType {
   PERCENTAGE
   FIXED
@@ -117,6 +122,8 @@ model Coupon {
   @@map("coupons")
 }
 
+=======
+>>>>>>> 35a4f5c9f644d653549f1d057fcfe07d21e1b27d
 model OrderItem {
   id        String  @id @default(uuid())
   orderId   String
